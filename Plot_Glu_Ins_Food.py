@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mlt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import datetime
+from datetime import date
+import os
 #read & clean
 data = pd.read_excel('RawData/元宝血糖记录.xlsx', index_col=None).iloc[:,0:5]
 data_note = pd.read_excel('RawData/元宝血糖记录.xlsx', index_col=None).iloc[:,5].fillna(0)
@@ -34,10 +36,8 @@ year_x = date[(date != 0)].index
 #note ticker
 note = data_note[(data_note != 0)].reset_index(drop=True)
 note_x = data_note[(data_note != 0)].index
-
 #safe valve
 safe_valve = 13.88
-
 #config figure
 plt.rcParams['font.sans-serif'] = ['SimHei']
 fig, host = plt.subplots(figsize=(16,9))
@@ -81,7 +81,6 @@ host.tick_params(axis='x', **tkw)
 plt.gca().set_xticklabels(data.iloc[:,1])
 plt.xticks(x)
 host.tick_params(axis='x', rotation=45)
-
 ##date ticker
 for i in range(0,len(year)):
     plt.text(year_x[i]+0.3, 1, year[i],rotation=45,horizontalalignment='center')
@@ -96,3 +95,5 @@ plt.title("Yuanbao BG & Insulin Monitor Plot",fontsize=22)
 host.plot(x, data_glu.fillna(0)*0+safe_valve, linestyle=':',color='y')
 host.text(0, 14, 'Safe Valve',horizontalalignment='center')
 plt.show()
+#update file
+plt.savefig("plot/yuanbao_"+str(datetime.datetime.now().strftime("%H%M_%d%m%Y")))

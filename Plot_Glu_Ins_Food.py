@@ -32,7 +32,7 @@ for i in range(0,len(data)):
     x_time.iloc[i,0]=datetime.datetime.strptime(str(date_cph.iloc[i])+str(data.iloc[i,1]), "%d-%m-%Y%H:%M:%S")
 data_glu_x = [x_time.iloc[i] for i in data_glu.fillna(0)[(data_glu.fillna(0) != 0)].index ]
 x_time_tick = [x_time.iloc[i] for i in range(0,len(x_time)) ]
-x_time_labels = [str(data.iloc[i,1]) if data_glu.fillna(0)[i] != 0 else '.'  for i in range(0,len(data))]
+x_time_labels = [str(data.iloc[i,1]) if data_glu.fillna(0)[i] != 0 else ' '  for i in range(0,len(data))]
 #ins x
 data_ins_x = [x_time.iloc[i] for i in data_ins.fillna(0)[(data_ins.fillna(0) != 0)].index ]
 #food x

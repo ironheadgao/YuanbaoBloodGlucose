@@ -4,8 +4,10 @@ from pandas import DataFrame
 import matplotlib.pyplot as plt
 import matplotlib as mlt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+import matplotlib.dates as mdates
 import datetime
 from datetime import date
+
 import os
 #read & clean
 data = pd.read_excel('RawData/元宝血糖记录.xlsx', index_col=None).iloc[:,0:5]
@@ -23,7 +25,19 @@ data.insert(2,'food_ql',data_food_ql)
 data.insert(3,'food_qt',data_food_qt)
 #define x
 x = range(len(data))
-x_glu_line = data.iloc[:,4].fillna(0)[(data.iloc[:,4].fillna(0) != 0)].index
+##glu x
+date_cph = data.iloc[:,0].fillna(method='ffill')
+x_time = DataFrame(np.zeros((len(data), 1)))
+for i in range(0,len(data)):
+    x_time.iloc[i,0]=datetime.datetime.strptime(str(date_cph.iloc[i])+str(data.iloc[i,1]), "%d-%m-%Y%H:%M:%S")
+data_glu_x = [x_time.iloc[i] for i in data_glu.fillna(0)[(data_glu.fillna(0) != 0)].index ]
+x_time_tick = [x_time.iloc[i] for i in range(0,len(x_time)) ]
+x_time_labels = [str(data.iloc[i,1]) if data_glu.fillna(0)[i] != 0 else '.'  for i in range(0,len(data))]
+#ins x
+data_ins_x = [x_time.iloc[i] for i in data_ins.fillna(0)[(data_ins.fillna(0) != 0)].index ]
+#food x
+data_food_x = [x_time.iloc[i] for i in data_food_qt.fillna(0)[(data_food_qt.fillna(0) != 0)].index ]
+
 #hide third  axis func
 def MakeInv(ax):
     ax.set_frame_on(True)
@@ -32,10 +46,10 @@ def MakeInv(ax):
         sp.set_visible(False)
 #date ticker
 year = date[(date != 0)].reset_index(drop=True)
-year_x = date[(date != 0)].index
+year_x =[x_time_tick[i]   for i in  date[(date != 0)].index]
 #note ticker
 note = data_note[(data_note != 0)].reset_index(drop=True)
-note_x = data_note[(data_note != 0)].index
+note_x = [x_time_tick[i]   for i in  data_note[(data_note != 0)].index]
 #safe valve
 safe_valve = 13.88
 #config figure
@@ -52,11 +66,12 @@ par2.spines["right"].set_position(("axes", 1.1))
 MakeInv(par2)
 par2.spines["right"].set_visible(True)
 #plot three variables
-p1, = host.plot(x_glu_line,data_glu.dropna(), color_glu, label="BloodGlucose mmol/L")
-host.scatter(x,data.iloc[:,4],c='b',marker='o')
-p2 = par1.scatter(x, data_ins, c=color_ins,label="Insulin μL")
-p3 = par2.scatter(x, data_food_qt, c=color_food, label="Food gramm")
-host.set_xlim(-1, len(data))
+host.plot(x_time_tick,data_glu.fillna(0),c='r',alpha=0) #base line
+p1, =host.plot(data_glu_x,data_glu.dropna(), color_glu, label="BloodGlucose mmol/L")
+host.scatter(data_glu_x,data_glu.dropna(),c='b',marker='o')
+p2 = par1.scatter(data_ins_x, data_ins.dropna(), c=color_ins,label="Insulin μL")
+p3 = par2.scatter(data_food_x, data_food_qt[(data_food_qt != 0)], c=color_food, label="Food gramm")
+#host.set_xlim(0,x_time.iloc[-1,0] )
 host.set_ylim(0, 1.1*max(data_glu))
 par1.set_ylim(0, 1.7*max(data_ins.fillna(0)))
 par2.set_ylim(1, 60)
@@ -77,23 +92,23 @@ par2.tick_params(axis='y', colors=color_food, **tkw)
 host.tick_params(axis='x', **tkw)
 #set ticker
 #if len(data)>60:
-#
-plt.gca().set_xticklabels(data.iloc[:,1])
-plt.xticks(x)
-host.tick_params(axis='x', rotation=45)
+plt.gca().set_xticklabels(x_time_labels)
+plt.xticks(x_time_tick)
+host.tick_params(axis='x', rotation=60,labelsize =8)
+
 ##date ticker
 for i in range(0,len(year)):
-    plt.text(year_x[i]+0.3, 1, year[i],rotation=45,horizontalalignment='center')
+    plt.text(year_x[i], 1.5, year[i],rotation=45,horizontalalignment='left')
 ##note ticker
 for i in range(0,len(note)):
-    plt.text(note_x[i]+1.5, 2, note[i],rotation=45,horizontalalignment='center',fontsize=8)
+    plt.text(note_x[i], 2, note[i],rotation=45,horizontalalignment='center',fontsize=8)
 #set legend
 lines = [p1, p2, p3]
 legend = host.legend(lines, [l.get_label() for l in lines],facecolor='w')
 plt.title("Yuanbao BG & Insulin Monitor Plot",fontsize=22)
 #plot safe valve
-host.plot(x, data_glu.fillna(0)*0+safe_valve, linestyle=':',color='y')
-host.text(0, 14, 'Safe Valve',horizontalalignment='center')
+host.plot(x_time_tick, data_glu.fillna(0)*0+safe_valve, linestyle=':',color='y')
+host.text(x_time_tick[0], 14.3, 'Safe Valve 13.88',horizontalalignment='right')
 plt.show()
 #update file
 plt.savefig("plot/yuanbao_"+str(datetime.datetime.now().strftime("%H%M_%d%m%Y")))

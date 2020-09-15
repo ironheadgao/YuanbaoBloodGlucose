@@ -112,3 +112,8 @@ host.text(x_time_tick[0], 14.5, 'Safe Valve 13.88',horizontalalignment='left',co
 plt.show()
 #update file
 plt.savefig("plot/yuanbao_"+str(datetime.datetime.now().strftime("%H%M_%d%m%Y")))
+#cut the plot in to daily period
+for i in  range(0,len(year_x)-1):
+    host.set_xlim(year_x[i]-timedelta(hours=2), year_x[i+1]+timedelta(hours=2))
+    plt.title("Yuanbao BG & Insulin Monitor Plot " + str(year[i]), fontsize=22)
+    plt.savefig("plot/yuanbao_" + str(year[i]))

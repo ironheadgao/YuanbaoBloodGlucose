@@ -71,7 +71,7 @@ p1, =host.plot(data_glu_x,data_glu.dropna(), color_glu, label="BloodGlucose mmol
 host.scatter(data_glu_x,data_glu.dropna(),c='b',marker='o')
 p2 = par1.scatter(data_ins_x, data_ins.dropna(), c=color_ins,label="Insulin μL")
 p3 = par2.scatter(data_food_x, data_food_qt[(data_food_qt != 0)], c=color_food, label="Food gramm")
-#host.set_xlim(0,x_time.iloc[-1,0] )
+host.set_xlim(data_glu_x[0],data_glu_x[-1] )
 host.set_ylim(0, 1.1*max(data_glu))
 par1.set_ylim(0, 1.7*max(data_ins.fillna(0)))
 par2.set_ylim(1, 60)

@@ -7,7 +7,7 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import matplotlib.dates as mdates
 import datetime
 from datetime import date
-
+from datetime import timedelta
 import os
 #read & clean
 data = pd.read_excel('RawData/元宝血糖记录.xlsx', index_col=None).iloc[:,0:5]
@@ -37,7 +37,6 @@ x_time_labels = [str(data.iloc[i,1]) if data_glu.fillna(0)[i] != 0 else ' '  for
 data_ins_x = [x_time.iloc[i] for i in data_ins.fillna(0)[(data_ins.fillna(0) != 0)].index ]
 #food x
 data_food_x = [x_time.iloc[i] for i in data_food_qt.fillna(0)[(data_food_qt.fillna(0) != 0)].index ]
-
 #hide third  axis func
 def MakeInv(ax):
     ax.set_frame_on(True)
@@ -95,7 +94,6 @@ host.tick_params(axis='x', **tkw)
 plt.gca().set_xticklabels(x_time_labels)
 plt.xticks(x_time_tick)
 host.tick_params(axis='x', rotation=60,labelsize =8)
-
 ##date ticker
 for i in range(0,len(year)):
     plt.text(year_x[i], 1.5, year[i],rotation=45,horizontalalignment='left')
@@ -105,10 +103,15 @@ for i in range(0,len(note)):
 #set legend
 lines = [p1, p2, p3]
 legend = host.legend(lines, [l.get_label() for l in lines],facecolor='w')
-plt.title("Yuanbao BG & Insulin Monitor Plot",fontsize=22)
+plt.title("Yuanbao BG & Insulin Monitor Plot 1",fontsize=22)
 #plot safe valve
 host.plot(x_time_tick, data_glu.fillna(0)*0+safe_valve, linestyle=':',color='y')
 host.text(x_time_tick[0], 14.5, 'Safe Valve 13.88',horizontalalignment='left',color='y')
 plt.show()
 #update file
 plt.savefig("plot/yuanbao_"+str(datetime.datetime.now().strftime("%H%M_%d%m%Y")))
+#cut the plot in to daily period
+for i in  range(0,len(year_x)-1):
+    host.set_xlim(year_x[i]-timedelta(hours=2), year_x[i+1]+timedelta(hours=2))
+    plt.title("Yuanbao BG & Insulin Monitor Plot " + str(year[i]), fontsize=22)
+    plt.savefig("plot/yuanbao_" + str(year[i]))

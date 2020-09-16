@@ -7,11 +7,12 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import matplotlib.dates as mdates
 import datetime
 from datetime import date
-
 import os
 #read & clean
-data = pd.read_excel('RawData/元宝血糖记录.xlsx', index_col=None).iloc[:,0:5]
-data_note = pd.read_excel('RawData/元宝血糖记录.xlsx', index_col=None).iloc[:,5].fillna(0)
+files = [os.path.join('RawData', x) for x in os.listdir('RawData') if x.endswith(".xlsx")]
+new = max(files , key = os.path.getctime)
+data = pd.read_excel(new, index_col=None).iloc[:,0:5]
+data_note = pd.read_excel(new, index_col=None).iloc[:,5].fillna(0)
 date = data.iloc[:,0].fillna(0) # date
 data.iloc[:,2] = data.iloc[:,2].fillna(0) #food
 #define y
@@ -114,6 +115,16 @@ plt.show()
 plt.savefig("plot/yuanbao_"+str(datetime.datetime.now().strftime("%H%M_%d%m%Y")))
 #cut the plot in to daily period
 for i in  range(0,len(year_x)-1):
+    host.tick_params(axis='x', rotation=60, labelsize=12)
     host.set_xlim(year_x[i]-timedelta(hours=2), year_x[i+1]+timedelta(hours=2))
+    host.text(year_x[i], 14.5, 'Safe Valve 13.88', horizontalalignment='left', color='y')
     plt.title("Yuanbao BG & Insulin Monitor Plot " + str(year[i]), fontsize=22)
     plt.savefig("plot/yuanbao_" + str(year[i]))
+
+#today
+if __name__ == '__main__':
+    host.tick_params(axis='x', rotation=60, labelsize=12)
+    host.set_xlim(year_x[-1], x_time_tick[-1]+timedelta(hours=2))
+    host.text(year_x[-1], 14.5, 'Safe Valve 13.88', horizontalalignment='left', color='y')
+    plt.title("Yuanbao BG & Insulin Monitor Plot " + str(year.iloc[-1]), fontsize=22)
+    plt.savefig("plot/yuanbao_ " + str(year.iloc[-1]))

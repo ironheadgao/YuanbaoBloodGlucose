@@ -7,6 +7,7 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import matplotlib.dates as mdates
 import datetime
 from datetime import date
+from datetime import timedelta
 import os
 #read & clean
 files = [os.path.join('RawData', x) for x in os.listdir('RawData') if x.endswith(".xlsx")]
@@ -124,7 +125,7 @@ for i in  range(0,len(year_x)-1):
 #today
 if __name__ == '__main__':
     host.tick_params(axis='x', rotation=60, labelsize=12)
-    host.set_xlim(year_x[-1], x_time_tick[-1]+timedelta(hours=2))
+    host.set_xlim(year_x[-1], x_time_tick[-1]+timedelta(hours=24))
     host.text(year_x[-1], 14.5, 'Safe Valve 13.88', horizontalalignment='left', color='y')
     plt.title("Yuanbao BG & Insulin Monitor Plot " + str(year.iloc[-1]), fontsize=22)
     plt.savefig("plot/yuanbao_ " + str(year.iloc[-1]))
